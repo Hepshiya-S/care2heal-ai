@@ -1,0 +1,112 @@
+[
+ {
+    "id": "med001",
+    "name": "Metformin",
+    "category": "Diabetes (Type 2)",
+    "dosage": "500mg to 1000mg, usually twice daily with meals",
+    "side_effects": "Nausea, diarrhea, stomach upset, metallic taste. Usually improves after a few weeks.",
+    "interactions": ["Alcohol (increases risk of lactic acidosis)", "Contrast dye used in some X-rays"],
+    "plain_explanation": "This medicine helps control blood sugar in type 2 diabetes. Take it with food to avoid an upset stomach.",
+    "source": "MedlinePlus (sample data)"
+  },
+  {
+    "id": "med002",
+    "name": "Amlodipine",
+    "category": "High Blood Pressure",
+    "dosage": "5mg to 10mg once daily",
+    "side_effects": "Swelling in ankles/feet, dizziness, flushing, headache",
+    "interactions": ["Simvastatin (increased muscle-related side effects)", "Grapefruit juice"],
+    "plain_explanation": "This medicine relaxes blood vessels to lower blood pressure. Take it at the same time each day.",
+    "source": "MedlinePlus (sample data)"
+  },
+  {
+    "id": "med003",
+    "name": "Atorvastatin",
+    "category": "Cholesterol",
+    "dosage": "10mg to 80mg once daily, usually at night",
+    "side_effects": "Muscle pain, joint pain, digestive issues",
+    "interactions": ["Amlodipine (increased muscle side effects)", "Grapefruit juice", "Certain antibiotics"],
+    "plain_explanation": "This medicine lowers bad cholesterol to protect your heart. Report unexplained muscle pain to your doctor.",
+    "source": "MedlinePlus (sample data)"
+  }, 
+  {
+    "id": "med004",
+    "name": "Aspirin",
+    "category": "Blood Thinner / Pain Relief",
+    "dosage": "75mg to 100mg once daily (low-dose, for heart protection)",
+    "side_effects": "Stomach irritation, increased bleeding risk, heartburn",
+    "interactions": ["Warfarin (dangerously increases bleeding risk)", "Ibuprofen (reduces heart-protective effect)"],
+    "plain_explanation": "This low-dose tablet helps prevent blood clots and protects your heart. Take it with food to protect your stomach.",
+    "source": "MedlinePlus (sample data)"
+  },
+  {
+    "id": "med005",
+    "name": "Omeprazole",
+    "category": "Acid Reflux / Stomach Protection",
+    "dosage": "20mg once daily, before breakfast",
+    "side_effects": "Headache, stomach pain, nausea, long-term use may lower vitamin B12",
+    "interactions": ["Clopidogrel (reduces its effectiveness)", "Warfarin (may increase bleeding risk slightly)"],
+    "plain_explanation": "This medicine reduces stomach acid to prevent heartburn and protect your stomach lining. Take it on an empty stomach.",
+    "source": "MedlinePlus (sample data)"
+  },
+  {
+    "id": "med006",
+    "name": "Levothyroxine",
+    "category": "Thyroid (Hypothyroidism)",
+    "dosage": "25mcg to 200mcg once daily, on an empty stomach",
+    "side_effects": "Rare at correct dose; too much can cause rapid heartbeat, anxiety, weight loss",
+    "interactions": ["Calcium supplements (reduces absorption)", "Iron supplements (reduces absorption)"],
+    "plain_explanation": "This medicine replaces a hormone your thyroid isn't making enough of. Take it first thing in the morning, at least 30 minutes before eating.",
+    "source": "MedlinePlus (sample data)"
+  },
+  {
+    "id": "med007",
+    "name": "Losartan",
+    "category": "High Blood Pressure",
+    "dosage": "25mg to 100mg once daily",
+    "side_effects": "Dizziness, tiredness, high potassium levels",
+    "interactions": ["Potassium supplements (risk of dangerously high potassium)", "NSAIDs like ibuprofen (reduces effectiveness, affects kidneys)"],
+    "plain_explanation": "This medicine relaxes blood vessels to lower blood pressure and protect your kidneys. Take it at the same time each day.",
+    "source": "MedlinePlus (sample data)"
+  },
+  {
+    "id": "med008",
+    "name": "Warfarin",
+    "category": "Blood Thinner",
+    "dosage": "Varies per person, based on regular blood tests (INR)",
+    "side_effects": "Bruising, bleeding, requires regular blood monitoring",
+    "interactions": ["Aspirin (dangerously increases bleeding risk)", "Many antibiotics", "Vitamin K-rich foods (reduces effectiveness)"],
+    "plain_explanation": "This medicine prevents dangerous blood clots. It needs regular blood tests to get the dose right, and many foods/medicines can affect how well it works.",
+    "source": "MedlinePlus (sample data)"
+  },
+  {
+    "id": "med009",
+    "name": "Insulin (Regular/NPH)",
+    "category": "Diabetes (Type 1 and 2)",
+    "dosage": "Varies per person, injected based on blood sugar readings",
+    "side_effects": "Low blood sugar (shakiness, sweating, confusion), weight gain",
+    "interactions": ["Alcohol (increases risk of low blood sugar)", "Beta-blockers (can hide low blood sugar symptoms)"],
+    "plain_explanation": "This is a hormone injection that controls blood sugar levels. Always eat after taking it to avoid your sugar dropping too low.",
+    "source": "MedlinePlus (sample data)"
+  },
+  {
+    "id": "med010",
+    "name": "Paracetamol",
+    "category": "Pain Relief / Fever",
+    "dosage": "500mg to 1000mg every 4-6 hours, max 4000mg per day",
+    "side_effects": "Generally safe at correct dose; overdose can cause serious liver damage",
+    "interactions": ["Warfarin (may slightly increase bleeding risk with regular high use)", "Alcohol (increases liver damage risk)"],
+    "plain_explanation": "This is a common pain and fever reliever. Never exceed the daily maximum dose, as too much can seriously harm your liver.",
+    "source": "MedlinePlus (sample data)"
+  },
+  {
+    "id": "med011",
+    "name": "Amoxicillin",
+    "category": "Antibiotic",
+    "dosage": "250mg to 500mg, 3 times daily, for the full prescribed course",
+    "side_effects": "Diarrhea, nausea, allergic rash",
+    "interactions": ["Warfarin (may increase bleeding risk)", "Oral contraceptives (may reduce effectiveness)"],
+    "plain_explanation": "This antibiotic treats bacterial infections. Always finish the full course even if you feel better, or the infection can come back stronger.",
+    "source": "MedlinePlus (sample data)"
+  }
+]
