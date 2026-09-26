@@ -5,3 +5,5 @@ chromadb
 sentence-transformers
 streamlit
 python-dotenv
+pytesseract
+Pillow
