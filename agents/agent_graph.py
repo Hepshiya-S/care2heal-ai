@@ -3,21 +3,35 @@ from typing import TypedDict, List
 from dotenv import load_dotenv
 from langgraph.graph import StateGraph, END
 from agents.rag_pipeline import retrieve_context, llm
+from modules.safety_checker import check_emergency
 
 load_dotenv()
 
-# --- State: the "memory" that flows through every node in the graph ---
-# Every node reads from this and writes back to it. Think of it as a
-# shared clipboard passed from station to station.
+
 class AgentState(TypedDict):
     question: str
     documents: List[str]
     metadatas: List[dict]
     relevant: bool
+    is_emergency: bool
     answer: str
 
 
-# --- Node 1: Retrieve ---
+# --- New Node 0: Safety check, runs FIRST, before any retrieval ---
+def safety_check_node(state: AgentState) -> AgentState:
+    state["is_emergency"] = check_emergency(state["question"])
+    return state
+
+
+def emergency_node(state: AgentState) -> AgentState:
+    state["answer"] = (
+        "⚠ This sounds like it may be a medical emergency. "
+        "Please call your local emergency number immediately or contact a caregiver right away. "
+        "This app cannot provide emergency medical care."
+    )
+    return state
+
+
 def retrieve_node(state: AgentState) -> AgentState:
     documents, metadatas = retrieve_context(state["question"])
     state["documents"] = documents
@@ -25,12 +39,8 @@ def retrieve_node(state: AgentState) -> AgentState:
     return state
 
 
-# --- Node 2: Grade relevance (the "self-check" step) ---
 def grade_node(state: AgentState) -> AgentState:
     context_block = "\n\n".join(state["documents"])
-
-    # We ask the LLM a YES/NO question about its OWN retrieval —
-    # this is the agent inspecting its own work before trusting it.
     grading_prompt = f"""You are checking whether the CONTEXT below actually contains
 information that directly answers the QUESTION. Reply with only one word: "yes" or "no".
 
@@ -45,7 +55,6 @@ Question: {state['question']}
     return state
 
 
-# --- Node 3a: Generate a grounded answer (only reached if relevant) ---
 def generate_node(state: AgentState) -> AgentState:
     context_block = "\n\n".join(
         f"[Source: {meta['name']}]\n{doc}"
@@ -53,7 +62,9 @@ def generate_node(state: AgentState) -> AgentState:
     )
     prompt = f"""You are a careful medical information assistant for elderly patients and their caregivers.
 
-Use ONLY the context below to answer. Do NOT use outside knowledge.
+Use ONLY the context below to answer. Do NOT use outside knowledge, even general medical
+knowledge you may know. If the context does not contain enough information, respond with
+EXACTLY: "I don't have information on this in my knowledge base. Please consult a doctor or pharmacist."
 
 Context:
 {context_block}
@@ -66,7 +77,6 @@ Answer in simple, plain language. Mention which source(s) your answer is based o
     return state
 
 
-# --- Node 3b: Honest refusal (only reached if NOT relevant) ---
 def insufficient_node(state: AgentState) -> AgentState:
     state["answer"] = (
         "I don't have information on this in my knowledge base. "
@@ -75,25 +85,35 @@ def insufficient_node(state: AgentState) -> AgentState:
     return state
 
 
-# --- The routing function: this is the actual "decision" ---
-# LangGraph calls this after grade_node to decide which path to take next.
+def route_after_safety(state: AgentState) -> str:
+    return "emergency" if state["is_emergency"] else "retrieve"
+
+
 def route_after_grading(state: AgentState) -> str:
     return "generate" if state["relevant"] else "insufficient"
 
 
-# --- Build the graph: nodes + edges, exactly like our flowchart ---
 graph = StateGraph(AgentState)
 
+graph.add_node("safety_check", safety_check_node)
+graph.add_node("emergency", emergency_node)
 graph.add_node("retrieve", retrieve_node)
 graph.add_node("grade", grade_node)
 graph.add_node("generate", generate_node)
 graph.add_node("insufficient", insufficient_node)
 
-graph.set_entry_point("retrieve")
-graph.add_edge("retrieve", "grade")
+graph.set_entry_point("safety_check")
 
-# This is the branch — "grade" doesn't go to one fixed next step,
-# it calls route_after_grading() and goes wherever that returns.
+graph.add_conditional_edges(
+    "safety_check",
+    route_after_safety,
+    {
+        "emergency": "emergency",
+        "retrieve": "retrieve"
+    }
+)
+
+graph.add_edge("retrieve", "grade")
 graph.add_conditional_edges(
     "grade",
     route_after_grading,
@@ -103,15 +123,15 @@ graph.add_conditional_edges(
     }
 )
 
+graph.add_edge("emergency", END)
 graph.add_edge("generate", END)
 graph.add_edge("insufficient", END)
 
-# Compile turns our node/edge definitions into a runnable agent
 app = graph.compile()
 
 
 if __name__ == "__main__":
-    print("Care2Heal Agentic RAG (Day 4) — type a question (or 'quit')\n")
+    print("Care2Heal Agentic RAG (Day 7: with safety check) — type a question (or 'quit')\n")
     while True:
         user_question = input("You: ")
         if user_question.lower() == "quit":
@@ -121,6 +141,7 @@ if __name__ == "__main__":
             "documents": [],
             "metadatas": [],
             "relevant": False,
+            "is_emergency": False,
             "answer": ""
         })
         print(f"\nCare2Heal: {result['answer']}\n")

@@ -7,3 +7,9 @@ streamlit
 python-dotenv
 pytesseract
 Pillow
+openai-whisper
+imageio-ffmpeg
+gTTS
+sounddevice
+scipy
+qrcode
