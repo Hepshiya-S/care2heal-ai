@@ -7,6 +7,21 @@ from modules.safety_checker import check_emergency
 
 load_dotenv()
 
+GREETING_KEYWORDS = [
+    "hello", "hi", "hey", "good morning", "good afternoon", "good evening",
+    "how are you", "thank you", "thanks", "bye", "goodbye", "ok", "okay"
+]
+
+
+def is_smalltalk(text: str) -> bool:
+    """Quick keyword check for greetings/casual chat — avoids wasting an LLM
+    call on something this simple, and keeps 'hello' from being treated as
+    a failed medical lookup."""
+    cleaned = text.lower().strip().strip("!.,?")
+    return cleaned in GREETING_KEYWORDS or any(
+        cleaned.startswith(kw + " ") for kw in GREETING_KEYWORDS
+    )
+
 
 class AgentState(TypedDict):
     question: str
@@ -14,12 +29,22 @@ class AgentState(TypedDict):
     metadatas: List[dict]
     relevant: bool
     is_emergency: bool
+    is_smalltalk: bool
     answer: str
 
 
-# --- New Node 0: Safety check, runs FIRST, before any retrieval ---
 def safety_check_node(state: AgentState) -> AgentState:
-    state["is_emergency"] = check_emergency(state["question"])
+    state["is_smalltalk"] = is_smalltalk(state["question"])
+    # No need to run emergency detection on obvious small talk
+    state["is_emergency"] = False if state["is_smalltalk"] else check_emergency(state["question"])
+    return state
+
+
+def smalltalk_node(state: AgentState) -> AgentState:
+    state["answer"] = (
+        "Hello! I'm Care2Heal, here to help with your medicines and health questions. "
+        "You can ask me things like \"What does Metformin do?\" or \"What should I be careful of with my medicines?\""
+    )
     return state
 
 
@@ -41,8 +66,9 @@ def retrieve_node(state: AgentState) -> AgentState:
 
 def grade_node(state: AgentState) -> AgentState:
     context_block = "\n\n".join(state["documents"])
-    grading_prompt = f"""You are checking whether the CONTEXT below actually contains
-information that directly answers the QUESTION. Reply with only one word: "yes" or "no".
+    grading_prompt = f"""You are checking whether the CONTEXT below contains information
+that is USEFUL for answering the QUESTION, even if it doesn't answer it completely or
+mentions a related medicine rather than an exact match. Reply with only one word: "yes" or "no".
 
 Context:
 {context_block}
@@ -86,7 +112,11 @@ def insufficient_node(state: AgentState) -> AgentState:
 
 
 def route_after_safety(state: AgentState) -> str:
-    return "emergency" if state["is_emergency"] else "retrieve"
+    if state["is_emergency"]:
+        return "emergency"
+    if state["is_smalltalk"]:
+        return "smalltalk"
+    return "retrieve"
 
 
 def route_after_grading(state: AgentState) -> str:
@@ -97,6 +127,7 @@ graph = StateGraph(AgentState)
 
 graph.add_node("safety_check", safety_check_node)
 graph.add_node("emergency", emergency_node)
+graph.add_node("smalltalk", smalltalk_node)
 graph.add_node("retrieve", retrieve_node)
 graph.add_node("grade", grade_node)
 graph.add_node("generate", generate_node)
@@ -109,6 +140,7 @@ graph.add_conditional_edges(
     route_after_safety,
     {
         "emergency": "emergency",
+        "smalltalk": "smalltalk",
         "retrieve": "retrieve"
     }
 )
@@ -124,6 +156,7 @@ graph.add_conditional_edges(
 )
 
 graph.add_edge("emergency", END)
+graph.add_edge("smalltalk", END)
 graph.add_edge("generate", END)
 graph.add_edge("insufficient", END)
 
@@ -131,7 +164,7 @@ app = graph.compile()
 
 
 if __name__ == "__main__":
-    print("Care2Heal Agentic RAG (Day 7: with safety check) — type a question (or 'quit')\n")
+    print("Care2Heal Agentic RAG — type a question (or 'quit')\n")
     while True:
         user_question = input("You: ")
         if user_question.lower() == "quit":
@@ -142,6 +175,7 @@ if __name__ == "__main__":
             "metadatas": [],
             "relevant": False,
             "is_emergency": False,
+            "is_smalltalk": False,
             "answer": ""
         })
         print(f"\nCare2Heal: {result['answer']}\n")

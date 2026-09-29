@@ -92,7 +92,7 @@
   {
     "id": "med010",
     "name": "Paracetamol",
-    "category": "Pain Relief / Fever",
+    "category": "Pain Relief / Fever (headache, body pain, toothache)",
     "dosage": "500mg to 1000mg every 4-6 hours, max 4000mg per day",
     "side_effects": "Generally safe at correct dose; overdose can cause serious liver damage",
     "interactions": ["Warfarin (may slightly increase bleeding risk with regular high use)", "Alcohol (increases liver damage risk)"],

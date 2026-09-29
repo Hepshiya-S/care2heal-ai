@@ -4,3 +4,7 @@ __pycache__/
 *.pyc
 .DS_Store
 data/chroma_db/
+temp_upload.jpg
+temp_input.wav
+response.mp3
+reorder_qr.png
